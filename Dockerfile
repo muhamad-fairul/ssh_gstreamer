@@ -26,7 +26,7 @@ RUN cd
 RUN pwd && ls
 RUN mkdir gstreamer
 RUN cd gstreamer
-wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.17.90.tar.xz
+RUN wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.17.90.tar.xz
 RUN tar -xf gstreamer-1.17.90
 WORKDIR gstreamer-1.17.90
 RUN meson build
