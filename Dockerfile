@@ -4,11 +4,11 @@ RUN apt-get update && apt-get install -y openssh-server #network
 RUN apt-get install -y mesa-va-drivers
 RUN apt-get install -y libdrm-dev
 RUN apt-get install -y ninja-build
-RUN apt-get install -y dpkg-dev flex bison autotools-dev automake
-RUN apt-get install -y liborc-dev autopoint libtool gtk-doc-tools yasm libgstreamer1.0-dev
-RUN apt-get install -y libxv-dev libasound2-dev libtheora-dev libogg-dev libvorbis-dev
-RUN apt-get install -y libbz2-dev libv4l-dev libvpx-dev libjack-jackd2-dev libsoup2.4-dev libpulse-dev
-RUN apt-get install -y faad libfaad-dev libfaac-dev libgl1-mesa-dev libgles2-mesa-dev
+#RUN apt-get install -y dpkg-dev flex bison autotools-dev automake
+#RUN apt-get install -y liborc-dev autopoint libtool gtk-doc-tools yasm libgstreamer1.0-dev
+#RUN apt-get install -y libxv-dev libasound2-dev libtheora-dev libogg-dev libvorbis-dev
+#RUN apt-get install -y libbz2-dev libv4l-dev libvpx-dev libjack-jackd2-dev libsoup2.4-dev libpulse-dev
+#RUN apt-get install -y faad libfaad-dev libfaac-dev libgl1-mesa-dev libgles2-mesa-dev
 RUN apt-get install -y libx264-dev libmad0-dev
 RUN apt-get install -y python3-pip python3-setuptools 
 RUN apt-get install -y python3-wheel ninja-build
