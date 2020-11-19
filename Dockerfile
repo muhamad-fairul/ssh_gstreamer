@@ -21,7 +21,7 @@ ENV NOTVISIBLE="in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
 RUN which gst-launch-1.0
-RUN which gst-play-1.0
+#RUN which gst-play-1.0
 
 RUN gst-launch-1.0 filesrc location=head-pose-face-detection-female-and-male.mp4 ! decodebin ! videoconvert ! ximagesink sync=false
 RUN ls
