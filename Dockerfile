@@ -1,43 +1,51 @@
-FROM ubuntu:20.04 #network
+FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install -y openssh-server #network
+RUN apt-get update && apt-get install -y openssh-server
+RUN apt-get install -y software-properties-common
 RUN apt-get install -y mesa-va-drivers
 RUN apt-get install -y libdrm-dev
-RUN apt-get install -y ninja-build
-#RUN apt-get install -y dpkg-dev flex bison autotools-dev automake
-#RUN apt-get install -y liborc-dev autopoint libtool gtk-doc-tools yasm libgstreamer1.0-dev
-#RUN apt-get install -y libxv-dev libasound2-dev libtheora-dev libogg-dev libvorbis-dev
-#RUN apt-get install -y libbz2-dev libv4l-dev libvpx-dev libjack-jackd2-dev libsoup2.4-dev libpulse-dev
-#RUN apt-get install -y faad libfaad-dev libfaac-dev libgl1-mesa-dev libgles2-mesa-dev
-RUN apt-get install -y libx264-dev libmad0-dev
-RUN apt-get install -y python3-pip python3-setuptools 
-RUN apt-get install -y python3-wheel ninja-build
 RUN apt-get install -y vainfo
 RUN apt-get install -y git build-essential gcc make yasm autoconf automake cmake libtool checkinstall wget software-properties-common pkg-config libmp3lame-dev libunwind-dev zlib1g-dev libssl-dev
 RUN apt-get update \
     && apt-get clean \
     && apt-get install -y --no-install-recommends libc6-dev libgdiplus wget software-properties-common
-RUN mkdir /var/run/sshd #network
-RUN pwd #network
-RUN echo 'root:Intel123!' | chpasswd #network
+RUN mkdir /var/run/sshd
+RUN echo 'root:Intel123!' | chpasswd
 RUN sed -i 's/#*PermitRootLogin prohibit-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
 
-RUN cd
-RUN pwd && ls
-RUN mkdir gstreamer
-RUN cd gstreamer
-RUN wget https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.17.90.tar.xz
-RUN tar -xf gstreamer-1.17.90
-WORKDIR gstreamer-1.17.90
-RUN meson build
-RUN ninja -C build
+# SSH login fix. Otherwise user is kicked off after login
+RUN sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd
 
-ADD head-pose-face-detection-female-and-male.mp4 /gstreamer
-RUN gst-launch-1.0 filesrc location=head-pose-face-detection-female-and-male.mp4 ! decodebin ! videoconvert ! ximagesink sync=false
+ENV NOTVISIBLE="in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+
+RUN mkdir /mediasdk
+WORKDIR mediasdk
+RUN export GST_VAAPI_ALL_DRIVERS=1
+RUN export LIBVA_DRIVER_NAME=iHD
+RUN export LIBVA_DRIVERS_PATH=/usr/lib/x86_64-linux-gnu/dri
+RUN wget https://www.ffmpeg.org/releases/ffmpeg-4.0.2.tar.gz
+RUN tar -xzf ffmpeg-4.0.2.tar.gz 
+RUN cd ffmpeg-4.0.2
+RUN ls
+RUN ./ffmpeg-4.0.2/configure --enable-gpl --enable-libmp3lame --enable-decoder=mjpeg,png --enable-encoder=png
+RUN make
+RUN make install
+
+#Run mediasdk example
+ADD head-pose-face-detection-female-and-male.mp4 /mediasdk
+WORKDIR /mediasdk
+RUN which gst-launch-1.0
+RUN which gst-play-1.0
+
+#RUN ffmpeg \
+#    -i head-pose-face-detection-female-and-male.mp4 \
+#    -an -vcodec copy -bsf h264_mp4toannexb \
+#    -f h264 bbb1920x1080.264
+
+#decode to raw YUV format using ffmpeg
+#RUN ffmpeg -i bbb1920x1080.264 bbb1920x1080.yuv
 RUN ls
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
-
-#https://gist.github.com/alasin/0be40411eea149343a296c85e0407bd7
-#https://gstreamer.freedesktop.org/documentation/tools/gst-launch.html?gi-language=c
